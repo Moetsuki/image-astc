@@ -21,7 +21,7 @@
 //! use image::GenericImageView;
 //!
 //! fn main() {
-//! let astc_data = std::fs::read("texture.astc").expect("Failed to read ASTC file");
+//!     let astc_data = std::fs::read("texture.astc").expect("Failed to read ASTC file");
 //!     // Convert to u32 slice as needed
 //!     let data_u32: &[u32] = bytemuck::cast_slice(&astc_data);
 //!
@@ -38,28 +38,7 @@
 //! ```
 
 use image::error::{DecodingError, ImageFormatHint, ImageResult, LimitError, LimitErrorKind};
-use image::{DynamicImage, ImageBuffer, ImageDecoder, ImageError};
-use std::mem::size_of;
-
-/// Reads all the bytes of a decoder into a Vec<T>. No particular alignment
-/// of the output buffer is guaranteed.
-///
-/// Panics if there isn't enough memory to decode the image.
-pub(crate) fn decoder_to_vec<T>(decoder: impl ImageDecoder) -> ImageResult<Vec<T>>
-where
-    T: bytemuck::Pod,
-{
-    let total_bytes = usize::try_from(decoder.total_bytes());
-    if total_bytes.is_err() || total_bytes.unwrap() > isize::MAX as usize {
-        return Err(ImageError::Limits(LimitError::from_kind(
-            LimitErrorKind::InsufficientMemory,
-        )));
-    }
-
-    let mut buf = vec![num_traits::Zero::zero(); total_bytes.unwrap() / size_of::<T>()];
-    decoder.read_image(bytemuck::cast_slice_mut(buf.as_mut_slice()))?;
-    Ok(buf)
-}
+use image::{DynamicImage, ImageBuffer, ImageError, Rgba};
 
 /// Decodes the ASTC header from the provided data slice.
 ///
@@ -130,10 +109,10 @@ pub(crate) fn decode_header(data: &[u8]) -> ImageResult<(u32, u32)> {
 pub fn load_from_memory(data: &[u32]) -> ImageResult<DynamicImage> {
     let (width, height) = decode_header(bytemuck::cast_slice(data))?;
 
-    let buf = decoder_to_vec(data)?;
+    let buf = data.into_iter().map(|v| *v).collect::<Vec<u32>>();
     ImageBuffer::from_raw(width, height, buf)
         .ok_or_else(|| {
             ImageError::Limits(LimitError::from_kind(LimitErrorKind::InsufficientMemory))
         })
-        .map(DynamicImage::ImageRgba8)
+        .map(|_arg0: ImageBuffer<Rgba<u32>, Vec<u32>>| DynamicImage::new_rgba8(width, height))
 }

@@ -1,5 +1,7 @@
 # image-astc
 
+[![Rust](https://github.com/Moetsuki/image-astc/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/Moetsuki/image-astc/actions/workflows/rust.yml)
+
 A decoder for ASTC (Adaptive Scalable Texture Compression) format images, built as an extension to the Rust `image`
 crate.
 

@@ -1,0 +1,20 @@
+[package]
+name = "image-astc"
+version = "0.1.0"
+edition = "2024"
+authors = ["Moetsuki <moetsuki@magma.so>"]
+description = "ASTC texture compression for the image crate"
+repository = "https://github.com/Moetsuki/image-astc"
+homepage = "https://github.com/Moetsuki/image-astc"
+documentation = "https://github.com/Moetsuki/image-astc/docs/index.md"
+readme = "README.md"
+keywords = ["image", "astc", "texture", "compression"]
+categories = ["graphics", "compression"]
+license = "MIT"
+include = ["src/*.rs", "Cargo.toml"]
+
+[dependencies]
+image = "0.23.14"
+thiserror = "2.0.12"
+bytemuck = "1.22.0"
+num-traits = "0.2.19"
